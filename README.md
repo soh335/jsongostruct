@@ -44,3 +44,4 @@ type XXX struct {
 * testing
 * tag position for struct type
 * nil value handling ( current, null value's type is &lt;nil&gt; )
+* detect array type more smart. ( current, detect type from first element of array )
