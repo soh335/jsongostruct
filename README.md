@@ -1,6 +1,6 @@
 # jsongostruct
 
-generate golang struct from json schema
+generate golang struct from json schema by go/ast
 
 ## example
 
