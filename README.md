@@ -1,11 +1,11 @@
-# jsonstruct.go
+# jsongostruct
 
 generate golang struct from json schema
 
 ## example
 
 ```
-cat /path/to/jsonfile | jsonstruct.go
+cat /path/to/jsonfile | jsongostruct
 ```
 
 ```json
