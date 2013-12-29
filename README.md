@@ -36,6 +36,7 @@ type XXX struct {
                 Foo      string `json:"foo"`
                 Dameleon string `json:"dameleon"`
         } `json:"map"`
+}
 ```
 
 ## TODO
