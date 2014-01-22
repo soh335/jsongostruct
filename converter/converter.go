@@ -62,7 +62,7 @@ func createFieldListFromMap(data reflect.Value) ([]*ast.Field, error) {
 
 		if value.IsNil() {
 			field = createField(
-				ast.NewIdent("<nil>"),
+				ast.NewIdent("interface{}"),
 				key.String(),
 			)
 		} else {
