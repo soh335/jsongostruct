@@ -102,7 +102,7 @@ func createFieldListFromMap(data reflect.Value) ([]*ast.Field, error) {
 					key.String(),
 				)
 			default:
-				panic(fmt.Sprintf("non support type", key.String(), "=>", value.Elem().Type().Kind().String()))
+				return nil, errors.New(fmt.Sprintf("non support type", key.String(), "=>", value.Elem().Type().Kind().String()))
 			}
 		}
 		fieldList = append(fieldList, field)
