@@ -90,7 +90,7 @@ func createFieldListFromMap(data reflect.Value) ([]*ast.Field, error) {
 				if value.Elem().Len() > 0 {
 					typeName = value.Elem().Index(0).Elem().Type().String()
 				} else {
-					typeName = "interface"
+					typeName = "interface{}"
 				}
 				field = createField(
 					ast.NewIdent("[]"+typeName),
