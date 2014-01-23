@@ -58,53 +58,11 @@ func createFieldListFromMap(data reflect.Value) ([]*ast.Field, error) {
 
 	for _, key := range data.MapKeys() {
 		value := data.MapIndex(key)
-		var field *ast.Field
-
-		if value.IsNil() {
-			field = createField(
-				ast.NewIdent("interface{}"),
-				key.String(),
-			)
-		} else {
-			switch value.Elem().Type().Kind() {
-			case reflect.Map:
-				_fieldList, err := createFieldListFromMap(value.Elem())
-				if err != nil {
-					return nil, err
-				}
-
-				structType := &ast.StructType{
-					Fields: &ast.FieldList{
-						List: _fieldList,
-					},
-				}
-
-				field = createField(
-					structType,
-					key.String(),
-				)
-			case reflect.Array, reflect.Slice:
-				//TODO: detect struct ?
-				// current detect slice type from head element
-				var typeName string
-				if value.Elem().Len() > 0 {
-					typeName = value.Elem().Index(0).Elem().Type().String()
-				} else {
-					typeName = "interface{}"
-				}
-				field = createField(
-					ast.NewIdent("[]"+typeName),
-					key.String(),
-				)
-			case reflect.String, reflect.Bool, reflect.Float64:
-				field = createField(
-					ast.NewIdent(value.Elem().Type().Kind().String()),
-					key.String(),
-				)
-			default:
-				return nil, errors.New(fmt.Sprintf("non support type", key.String(), "=>", value.Elem().Type().Kind().String()))
-			}
+		typ, err := createType(value)
+		if err != nil {
+			return nil, err
 		}
+		field := createField(typ, key.String())
 		fieldList = append(fieldList, field)
 	}
 
@@ -112,12 +70,49 @@ func createFieldListFromMap(data reflect.Value) ([]*ast.Field, error) {
 }
 
 func createField(expr ast.Expr, name string) *ast.Field {
-
-	//TODO: handling tag for struct
 	return &ast.Field{
 		Type:  expr,
 		Names: []*ast.Ident{ast.NewIdent(camelize(name))},
-		Tag:   &ast.BasicLit{Kind: token.STRING, Value: "`json:\"" + name + "\"`"},
+		Tag:   &ast.BasicLit{ValuePos: 8, Kind: token.STRING, Value: "`json:\"" + name + "\"`"},
+	}
+}
+
+func createType(value reflect.Value) (ast.Expr, error) {
+	if value.IsNil() {
+		// empty interface{}
+		return &ast.InterfaceType{Methods: &ast.FieldList{Opening: 1, Closing: 2}}, nil
+	} else {
+		switch value.Elem().Type().Kind() {
+		case reflect.Map:
+			_fieldList, err := createFieldListFromMap(value.Elem())
+			if err != nil {
+				return nil, err
+			}
+
+			structType := &ast.StructType{
+				Fields: &ast.FieldList{
+					List: _fieldList,
+				},
+			}
+
+			return structType, nil
+		case reflect.Array, reflect.Slice:
+			var elt ast.Expr
+			var err error
+			if value.Elem().Len() > 0 {
+				elt, err = createType(value.Elem().Index(0))
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				elt = &ast.InterfaceType{Methods: &ast.FieldList{Opening: 1, Closing: 2}}
+			}
+			return &ast.ArrayType{Elt: elt}, nil
+		case reflect.String, reflect.Bool, reflect.Float64:
+			return ast.NewIdent(value.Elem().Type().Kind().String()), nil
+		default:
+			return nil, errors.New(fmt.Sprint("non support type", value.Elem().Type().Kind().String()))
+		}
 	}
 }
 
