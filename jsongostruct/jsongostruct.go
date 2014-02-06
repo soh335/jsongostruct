@@ -1,4 +1,4 @@
-package converter
+package jsongostruct
 
 import (
 	"bytes"
@@ -14,7 +14,7 @@ import (
 	"strings"
 )
 
-func JsonGoStruct(r io.Reader, w io.Writer, name string) error {
+func Convert(r io.Reader, w io.Writer, name string) error {
 	dec := json.NewDecoder(r)
 
 	var json interface{}

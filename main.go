@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/soh335/jsongostruct/converter"
+	"github.com/soh335/jsongostruct/jsongostruct"
 	"os"
 )
 
@@ -14,7 +14,7 @@ var (
 func main() {
 	flag.Parse()
 
-	if err := converter.JsonGoStruct(os.Stdin, os.Stdout, *name); err != nil {
+	if err := jsongostruct.Convert(os.Stdin, os.Stdout, *name); err != nil {
 		fmt.Print(err)
 	}
 }

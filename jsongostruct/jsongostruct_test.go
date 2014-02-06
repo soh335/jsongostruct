@@ -1,4 +1,4 @@
-package converter
+package jsongostruct
 
 import (
 	"testing"
